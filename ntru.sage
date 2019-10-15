@@ -2,7 +2,7 @@ import sage
 
 N = 5
 
-p = 3a
+p = 3
 q = 17
 
 # R(N) quotient polynominal ring over Z
