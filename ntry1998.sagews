@@ -1,27 +1,19 @@
 import collections
 import random
 
-#Parameters.
-N = 503
+#Parameters
+
+n = 503
+
 p = 3
-q = 239
+q = 256
+prime = 2
 df = 215
 dg = 72
 dr = 55
+dm = 55
 
-#R(N) quotient polynominal ring over Z.
 Z.<x> = ZZ[]
-RN = Z.quotient((x**N)-1, names='x')
-
-#Rp(N) quotient ring over Fp.
-Fp = GF(p)
-Zp.<x> = PolynomialRing(GF(p))
-Rp = Zp.quotient((x**N)-1, names='x')
-
-#Rq(N) quotient ring over Fq.
-Fq = GF(q)
-Zq.<x> = PolynomialRing(Fq)
-Rq = Zq.quotient((x**N)-1, names='x')
 
 #Ternary polyonomianl generating function.
 def poli(d1, d2, N):
@@ -43,86 +35,59 @@ def poli(d1, d2, N):
             ld2 = ld2 + 1
     return p
 
-#Central lift from defined as clq: Rq -> RN.
-def clq(f):
-    result = []
-    for fi in f:
-        if fi >= 0 and fi <= q//2:
-            result.append(int(fi))
-        else:
-            result.append(int(fi) - q)
-    return result
+#Central lift function defined as clf: Fq -> RN
+def clf(f, q, n):
+    g = list(((f[i] + q//2) % q) - q//2 for i in range(n))
+    return Z(g)
 
-#Central lift from defined as clp: Rp -> RN.
-def clp(f):
-    result = []
-    for fi in f:
-        if fi >= 0 and fi <= p//2:
-            result.append(int(fi))
-        else:
-            result.append(int(fi) - p)
-    return result
+#Function that finds polynominal invers mod p
+def invertmodprime(f, p):
+    Zp = Z.change_ring(Integers(p))
+    T = Zp.quotient((x**n)-1, names='x')
+    return Z(lift(1 / T(f)))
+
+#Function that finds polynominal invers mod p^k
+def invertmodpowerofprime(f, q, n, _prime):
+    assert q.is_power_of(_prime)
+    g = invertmodprime(f, _prime)
+    while True:
+        r = clf(g * f % (x^n-1), q, n)
+        if r == 1: return g
+        g = clf((g * (_prime - r)) % (x^n-1), q, n)
 
 #Key generation function returns set (priv, pub).
-def key_gen():
-    f, g = poli(df + 1, df, N), poli(dg, dg, N)
-    fp = Rp(f)
-    fq = Rq(f)
-
-    fpi = fp**-1
-    fqi = fq**-1
-    gq = Rq(g)
-
-    fqi_coefs = list(fqi)
-
-    tmp_result = []
-
-    for i in fqi_coefs:
-        tmp_result.append((i * p) % q)
-
-    h = Rq(tmp_result)
-
-    h = h * gq
-    return ((fq, fpi), h)
+def gen():
+    f, g = Z(poli(df + 1, df, n)), Z(poli(dg, dg, n))
+    fp_i = invertmodprime(f, p)
+    fq_i = invertmodpowerofprime(f, q, n, prime)
+    h = clf(p * ((fq_i * g) % (x^n-1)), q, n)
+    return ((f, fp_i), h) # priv, pub
 
 #Encryption function returnes ciphertext e.
 def enc(pub, m):
-    r = poli(dr, dr, N)
-    m_in_Rq, r_in_Rq = Rq(m), Rq(r)
-    e = r_in_Rq * pub + m_in_Rq
+    r = Z(poli(dr, dr, n))
+    e = clf(((pub * r) % (x^n-1)) + m, q, n)
     return e
 
 #Decryption function returnes decrypted message m.
 def dec(priv, e):
-    fq, fpi = priv
-    aq = e * fq
-    a = clq(list(aq))
-
-    tmp_result = []
-
-    for i in a:
-        tmp_result.append(i % p)
-    a = tmp_result
-
-    mp = list(Rp(a) * fpi)
-
-    m = clp(mp)
+    fq, fp_i = priv
+    a = clf((e * fq % (x^n-1)), q, n)
+    m = clf((a * fp_i % (x^n-1)), p, n)
     return m
 
-#Example of usage. Single cycle of generation, encryption and decryption.
+#Example of usage. Single cycle of generation, encryption and decryption
 def test():
     #GENERATING
-
-    priv, pub = key_gen()
+    priv, pub = gen()
 
     #ENCRYPTION
-    dm = 55
-    m = poli(dm, dm, N)
-
+    m = Z(poli(dm, dm, n))
     e = enc(pub, m)
-    #DECRYPTION
 
+    #DECRYPTION
     m_decrypted = dec(priv, e)
+
     if collections.Counter(m) == collections.Counter(m_decrypted):
         return True
     else:
