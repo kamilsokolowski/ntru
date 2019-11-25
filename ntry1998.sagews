@@ -2,7 +2,6 @@ import collections
 import random
 
 #Parameters
-
 n = 503
 
 p = 3
