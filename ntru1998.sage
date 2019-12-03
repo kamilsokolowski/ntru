@@ -77,3 +77,16 @@ def dec(priv, e):
     a = clf((e * fq % (x^n-1)), q, n)
     m = clf((a * fp_i % (x^n-1)), p, n)
     return m
+
+#Example of usage. Single cycle of generation, encryption and decryption.
+#GENERATING
+
+#priv, pub = key_gen()
+
+#ENCRYPTION
+#m = poli(dm, N)
+
+#e = enc(pub, m)
+#DECRYPTION
+
+#m_decrypted = dec(priv, e)
