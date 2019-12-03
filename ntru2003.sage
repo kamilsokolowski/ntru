@@ -18,25 +18,6 @@ gen_t = []
 enc_t = []
 dec_t = []
 
-def timeit(method):
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        if 'log_time' in kw:
-            name = kw.get('log_name', method.__name__.upper())
-            kw['log_time'][name] = int((te - ts) * 1000)
-        else:
-            if method.__name__ == 'key_gen':
-                gen_t.append((te - ts))
-            if method.__name__ == 'enc':
-                enc_t.append((te - ts))
-            if method.__name__ == 'dec':
-                dec_t.append((te - ts))
-            #print '%r  %2.2f ms' % (method.__name__, (te - ts) * 1000)
-        return result
-    return timed
-
 #R(N) quotient polynominal ring over Z.
 Z.<x> = ZZ[]
 RN = Z.quotient((x**N)-1, names='x')
@@ -74,7 +55,6 @@ def clp(f):
     return [int(fi) if fi >= 0 and fi <= p//2 else int(fi) - p for fi in f]
 
 #Key generation function returns set (priv, pub).
-@timeit
 def key_gen():
     f1 = poli(df, N)
     g = poli(dg, N)
@@ -89,13 +69,11 @@ def key_gen():
     return ((fq, fpi), h)
 
 #Encryption function returnes ciphertext e.
-@timeit
 def enc(pub, m):
     r = poli(dr, N)
     return Rq(r) * pub + Rq(m)
 
 #Decryption function returnes decrypted message m.
-@timeit
 def dec(priv, e):
     fq, fpi = priv
 
