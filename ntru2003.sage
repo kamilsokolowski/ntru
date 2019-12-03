@@ -102,36 +102,14 @@ def dec(priv, e):
     return clp(list(Rp([i % p for i in clq(list(e * fq))]) * fpi))
 
 #Example of usage. Single cycle of generation, encryption and decryption.
-def test():
-    #GENERATING
+#GENERATING
 
-    priv, pub = key_gen()
+#priv, pub = key_gen()
 
-    #ENCRYPTION
-    m = poli(dm, N)
+#ENCRYPTION
+#m = poli(dm, N)
 
-    e = enc(pub, m)
-    #DECRYPTION
+#e = enc(pub, m)
+#DECRYPTION
 
-    m_decrypted = dec(priv, e)
-    if collections.Counter(m) == collections.Counter(m_decrypted):
-        return True
-    else:
-        return False
-
-#Running some iteration of test function to test if
-#everthing works correctly.
-succes = 0
-failure = 0
-for i in range(100):
-    res = test()
-    if res == True:
-        succes += 1
-    else:
-        failure += 1
-
-print("Succeses: {}".format(succes))
-print("Failures: {}".format(failure))
-print("Gen avarage: {0:.7f}".format(np.average(gen_t)))
-print("Enc avarage: {0:.7f}".format(np.average(enc_t)))
-print("Dec avarage: {0:.7f}".format(np.average(dec_t)))
+#m_decrypted = dec(priv, e)
