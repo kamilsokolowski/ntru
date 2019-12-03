@@ -1,13 +1,17 @@
 import collections
 import random
+import time
+import math
 
 #Parameters.
-N = 503
+N = 251
+
 p = 3
 q = 239
-df = 215
-dg = 72
-dr = 55
+df = 23
+dg = 22
+dr = 20
+dm = 20
 
 #R(N) quotient polynominal ring over Z.
 Z.<x> = ZZ[]
@@ -45,23 +49,11 @@ def poli(d1, d2, N):
 
 #Central lift from defined as clq: Rq -> RN.
 def clq(f):
-    result = []
-    for fi in f:
-        if fi >= 0 and fi <= q//2:
-            result.append(int(fi))
-        else:
-            result.append(int(fi) - q)
-    return result
+    return [int(fi) if fi >= 0 and fi <= q//2 else int(fi) - q for fi in f]
 
 #Central lift from defined as clp: Rp -> RN.
 def clp(f):
-    result = []
-    for fi in f:
-        if fi >= 0 and fi <= p//2:
-            result.append(int(fi))
-        else:
-            result.append(int(fi) - p)
-    return result
+    return [int(fi) if fi >= 0 and fi <= p//2 else int(fi) - p for fi in f]
 
 #Key generation function returns set (priv, pub).
 def key_gen():
@@ -71,59 +63,18 @@ def key_gen():
 
     fpi = fp**-1
     fqi = fq**-1
-    gq = Rq(g)
 
-    fqi_coefs = list(fqi)
+    h = Rq([(i * p) % q for i in list(fqi)]) * Rq(g)
 
-    tmp_result = []
-
-    for i in fqi_coefs:
-        tmp_result.append((i * p) % q)
-
-    h = Rq(tmp_result)
-
-    h = h * gq
     return ((fq, fpi), h)
 
 #Encryption function returnes ciphertext e.
 def enc(pub, m):
     r = poli(dr, dr, N)
-    m_in_Rq, r_in_Rq = Rq(m), Rq(r)
-    e = r_in_Rq * pub + m_in_Rq
-    return e
+    return Rq(r) * pub + Rq(m)
 
 #Decryption function returnes decrypted message m.
 def dec(priv, e):
     fq, fpi = priv
-    aq = e * fq
-    a = clq(list(aq))
+    return clp(list(Rp([i % p for i in clq(list(e * fq))]) * fpi))
 
-    tmp_result = []
-
-    for i in a:
-        tmp_result.append(i % p)
-    a = tmp_result
-
-    mp = list(Rp(a) * fpi)
-
-    m = clp(mp)
-    return m
-
-#Example of usage. Single cycle of generation, encryption and decryption.
-def test():
-    #GENERATING
-
-    priv, pub = key_gen()
-
-    #ENCRYPTION
-    dm = 55
-    m = poli(dm, dm, N)
-
-    e = enc(pub, m)
-    #DECRYPTION
-
-    m_decrypted = dec(priv, e)
-    if collections.Counter(m) == collections.Counter(m_decrypted):
-        return True
-    else:
-        return False
