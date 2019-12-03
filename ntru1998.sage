@@ -1,4 +1,3 @@
-import collections
 import random
 
 #Parameters
@@ -7,10 +6,14 @@ n = 503
 p = 3
 q = 256
 prime = 2
-df = 215
-dg = 72
-dr = 55
-dm = 55
+df = 100
+dg = 100
+dr = 100
+dm = 100
+
+gen_t = []
+enc_t = []
+dec_t = []
 
 Z.<x> = ZZ[]
 
@@ -20,7 +23,7 @@ def poli(d1, d2, N):
     p = [0 for i in range(N)]
     ld1 = 0
     ld2 = 0
-    while(d1!=ld1):
+    while(d1 != ld1):
         tmp1 = random.choice(lp)
         element = p[tmp1]
         if element != 1 and element != -1:
@@ -74,20 +77,3 @@ def dec(priv, e):
     a = clf((e * fq % (x^n-1)), q, n)
     m = clf((a * fp_i % (x^n-1)), p, n)
     return m
-
-#Example of usage. Single cycle of generation, encryption and decryption
-def test():
-    #GENERATING
-    priv, pub = gen()
-
-    #ENCRYPTION
-    m = Z(poli(dm, dm, n))
-    e = enc(pub, m)
-
-    #DECRYPTION
-    m_decrypted = dec(priv, e)
-
-    if collections.Counter(m) == collections.Counter(m_decrypted):
-        return True
-    else:
-        return False
