@@ -78,3 +78,15 @@ def dec(priv, e):
     fq, fpi = priv
     return clp(list(Rp([i % p for i in clq(list(e * fq))]) * fpi))
 
+#Example of usage. Single cycle of generation, encryption and decryption.
+#GENERATING
+
+#priv, pub = key_gen()
+
+#ENCRYPTION
+#m = poli(dm, N)
+
+#e = enc(pub, m)
+#DECRYPTION
+
+#m_decrypted = dec(priv, e)
