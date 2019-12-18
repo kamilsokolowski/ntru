@@ -14,10 +14,6 @@ dg = 72
 dr = 72
 dm = 72
 
-gen_t = []
-enc_t = []
-dec_t = []
-
 #R(N) quotient polynominal ring over Z.
 Z.<x> = ZZ[]
 RN = Z.quotient((x**N)-1, names='x')
@@ -80,14 +76,14 @@ def dec(priv, e):
     return clp(list(Rp([i % p for i in clq(list(e * fq))]) * fpi))
 
 #Example of usage. Single cycle of generation, encryption and decryption.
-#GENERATING
 
+#GENERATING
 #priv, pub = key_gen()
 
 #ENCRYPTION
 #m = poli(dm, N)
 
 #e = enc(pub, m)
-#DECRYPTION
 
+#DECRYPTION
 #m_decrypted = dec(priv, e)
