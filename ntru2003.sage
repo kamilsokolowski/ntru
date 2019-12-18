@@ -82,7 +82,6 @@ def dec(priv, e):
 
 #ENCRYPTION
 #m = poli(dm, N)
-
 #e = enc(pub, m)
 
 #DECRYPTION
