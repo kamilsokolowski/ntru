@@ -52,12 +52,13 @@ def clp(f):
 #Key generation function returns set (priv, pub).
 def key_gen():
     f1 = poli(df, N)
+    f2 = poli(df, N)
+    f3 = poli(df, N)
     g = poli(dg, N)
-    f = list(p * Rp(f1) + 1)
-    fp = Rp(f)
-    fq = Rq(f)
-    fpi = fp**-1
-    fqi = fq**-1
+    F = list(Rp(f1) * Rp(f1) + Rp(f1))
+    f = list(p * Rp(F) + 1)
+    fp, fq = Rp(f), Rq(f)
+    fpi, fqi = fp**-1, fq**-1
 
     h = Rq([(i * p) % q for i in list(fqi)]) * Rq(g)
 
